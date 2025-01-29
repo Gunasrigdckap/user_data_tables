@@ -19,8 +19,13 @@ Route::get('/', function () {
     return view('index');
 });
 
+
+
+
+
 // Route::get('/users/{role}', [userController::class, 'usersdata']);
-Route::get('/users', [userController::class, 'usersdata']);
+
+Route::get('/users', [userController::class, 'usersData']);
 Route::post('/users/store', [userController::class, 'insertdata']);
 Route::get('/fileupload',[userController::class, 'fileupload']);
 Route::post('/import',[userController::class, 'import']);

@@ -11,20 +11,46 @@ class userController extends Controller
 {
 
 //fetch data using join query
- public function usersdata(){
+//  public function usersdata(){
+//     $users = User::
+//     leftJoin('students_subjects','users.id','=','students_subjects.user_id')
+//     ->select('users.id','users.name','users.age','users.dept','users.email','students_subjects.subjects')
+//     ->get();
+//     return response()->json(['data'=>$users]);
+//     // dd($role);
+//     // if($role == 'admin'){
+//     //     return view('index');
+//     // }
+//     // elseif($role == 'user'){
+//     //     return view('welcome');
+//     // }
+//  }
+
+
+
+
+public function usersData(Request $request)
+{
+    $search = $request->get('search', '');
+    $orderColumn = $request->get('orderColumn', 'id');
+    $orderDirection = $request->get('orderDirection', 'asc');
+
     $users = User::
-    leftJoin('students_subjects','users.id','=','students_subjects.user_id')
-    ->select('users.id','users.name','users.age','users.dept','users.email','students_subjects.subjects')
-    ->get();
-    return response()->json(['data'=>$users]);
-    // dd($role);
-    // if($role == 'admin'){
-    //     return view('index');
-    // }
-    // elseif($role == 'user'){
-    //     return view('welcome');
-    // }
- }
+    leftJoin('students_subjects', 'users.id', '=', 'students_subjects.user_id')
+        ->select('users.id', 'users.name', 'users.age', 'users.dept', 'users.email', 'students_subjects.subjects')
+        ->when($search, function ($query ,$search) {
+            $query->where('users.name','like',"%$search%")
+                ->orWhere('users.email','like',"%$search%")
+                ->orWhere('users.age','like',"%$search%")
+                ->orWhere('users.dept','like',"%$search%")
+                ->orWhere('students_subjects.subjects','like',"%$search%");
+        })
+        ->orderBy($orderColumn, $orderDirection)
+        ->get();
+
+    return response()->json(['data' => $users]);
+}
+
      public function insertdata(Request $request){
         $user = User::create([
             'name' => $request->name,

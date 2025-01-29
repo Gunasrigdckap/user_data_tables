@@ -8,8 +8,14 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" href="{{ asset('css/header/header.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/index.css')}}">
     <link rel="stylesheet" href="{{ asset('css/footer/footer.css') }}">
 </head>
+<style>
+    /* .dataTables_filter {
+display: none;
+} */
+</style>
 <body>
     <header class="row">
         @include('includes.header')
@@ -46,6 +52,23 @@
         </div>
         <button type="submit">Submit</button>
     </form>
+    <div class="filtering">
+        <div class="search-box"><label for="search">Search: </label><input type="text" placeholder="search"></div>
+        <div class="sorting"><label for="sort">Sort by:</label>
+            <select id="sortdrop">
+                <option value="id">ID</option>
+                <option value="name">Name</option>
+                <option value="age">Age</option>
+                <option value="dept">Department</option>
+                <option value="email">Email</option>
+                <option value="subjects">Subjects</option>
+            </select>
+            <select id="sortby">
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+            </select>
+        </div>
+    </div>
 
     <!-- data table -->
     <table id="usersTable">
@@ -68,12 +91,19 @@
                 ajax: {
                     url: '/users',
                     method: 'GET',
+                    data:function(value){
+                        value.search = $('.search-box input').val();
+                        value.orderColumn = $('#sortdrop').val();
+                        value.orderDirection = $('#sortby').val();
+                    },
                 },
                 pageLength: 3,
-                lengthMenu: [3,5,10,15],
+                ordering: false,
+                searching: false,
+                lengthMenu: [3,5,10,15,20,30],
                 columns: [
-                    { data: 'id'  },
-                    { data: 'name' },
+                    { data: 'id'},
+                    { data: 'name'},
                     { data: 'age'},
                     { data: 'dept'},
                     { data: 'email'},
@@ -81,7 +111,20 @@
                 ]
             });
 
+            $('#sortdrop,#sortby').on('change',function(){
+                let column = $('#sortdrop').val();
+                let sortby = $('#sortby').val();
+                userTable.ajax.params({
+                    orderColumn : column,
+                    orderDirection : sortby,
+                });
+                userTable.ajax.reload();
+            })
+            $('.search-box input').on('keyup', function() {
+        userTable.ajax.reload();
+    });
         });
+
 
          // form submission
          $('#userForm').on('submit', function (e) {
