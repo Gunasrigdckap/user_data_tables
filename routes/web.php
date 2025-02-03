@@ -30,6 +30,13 @@ Route::post('/users/store', [userController::class, 'insertdata']);
 Route::get('/fileupload',[userController::class, 'fileupload']);
 Route::post('/import',[userController::class, 'import']);
 
+Route::get('/studentmark',[userController::class,'studentmark']);
+Route::post('/studentmark/store',[userController::class,'insertmark']);
+
+Route::get('/viwchart',[userController::class,'viewChart']);
+Route::get('/user/{id}/subjects_and_marks', [userController::class, 'getUserSubjectsAndMarks']);
+
+
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth'])->name('dashboard');

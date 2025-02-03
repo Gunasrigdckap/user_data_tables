@@ -84,7 +84,13 @@ display: none;
         </thead>
     </table>
 
-
+    <div id="sideOverlay" class="side-overlay">
+        <span class="close-btn">&times;</span>
+        <h2>User Subjects & Marks</h2>
+        <div id="overlayContent">
+           {{-- data --}}
+        </div>
+    </div>
     <script>
         $(document).ready(function(){
             let userTable = $("#usersTable").DataTable({
@@ -103,7 +109,10 @@ display: none;
                 lengthMenu: [3,5,10,15,20,30],
                 columns: [
                     { data: 'id'},
-                    { data: 'name'},
+                    { data: 'name',
+                     render: function(data, type, row) {
+                return `<span class="user-name" data-id="${row.id}">${data}</span>`;
+            }},
                     { data: 'age'},
                     { data: 'dept'},
                     { data: 'email'},
@@ -144,6 +153,42 @@ display: none;
                     },
                 });
             });
+
+
+$(document).ready(function() {
+    $('#usersTable').on('click', '.user-name', function() {
+        let userId = $(this).data('id');
+
+        // Fetch subjects and marks for this user
+        $.ajax({
+            url: '/user/' + userId + '/subjects_and_marks', // Route to fetch subjects and marks
+            method: 'GET',
+            success: function(response) {
+                if (response.data && response.data.length > 0) {
+                    let content = '<h3>' + response.data[0].name + '</h3>';
+                    content += '<ul>';
+
+                    response.data.forEach(function(item) {
+                        content += '<li><strong>Subject:</strong> ' + item.subjects + ' | <strong>Marks:</strong> ' + (item.mark || 'N/A') + '</li>';
+                    });
+
+                    content += '</ul>';
+                    $('#overlayContent').html(content);
+                    $("#sideOverlay").addClass("open");
+                }
+            },
+            error: function(error) {
+                console.log('Error fetching data', error);
+            }
+        });
+    });
+
+    // Close the side overlay
+    $(".close-btn").on("click", function() {
+        $("#sideOverlay").removeClass("open");
+    });
+});
+
 
 
     </script>

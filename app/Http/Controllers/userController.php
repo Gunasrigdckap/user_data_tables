@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\subject;
+use App\Models\studentMarks;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -90,6 +91,37 @@ public function usersData(Request $request)
             return view('fileupload');
 
      }
+     public function viewChart(Request $request){
+        return view('chart');
+
+     }
+
+     public function studentmark(Request $request){
+        $students = User::all();
+        // dd($students->pluck('name'));
+        return view('students_marks',compact('students'));
+
+ }
+
+ public function insertmark(Request $request){
+    $student = User::find($request->student_id);
+    $mark=$request->mark;
+    if($mark <=100){
+        $studentMark = studentMarks::create([
+            'student_id' => $request->student_id,
+            'name' => $student->name,
+            'subject' => $request->subject,
+            'mark'=>$mark
+        ]);
+    }
+    else{
+        return response()->json(['message' => 'Mark is not valid'], 400);
+        }
+
+    return response()->json($studentMark);
+ }
+
+
 
      public function import(Request $request)
      {
@@ -125,5 +157,35 @@ public function usersData(Request $request)
 
          return view('index');
      }
+     public function getUserSubjectsAndMarks($userId)
+     {
+         // Fetch user data and their subjects and marks from the studentMarks table
+         $user = User::find($userId);
 
-}
+         if (!$user) {
+             return response()->json(['message' => 'User not found'], 404);
+         }
+
+         // Get subjects and marks for the user from the studentMarks table
+         $marksData = studentMarks::where('student_id', $userId)->get();
+
+         // If no marks data is found
+         if ($marksData->isEmpty()) {
+             return response()->json(['message' => 'No marks data found for this user'], 404);
+         }
+
+         // Return the subjects and marks as a response
+         $data = $marksData->map(function($markEntry) {
+             return [
+                 'subject' => $markEntry->subject,
+                 'mark' => $markEntry->mark,
+             ];
+         });
+
+         return response()->json(['data' => $data]);
+     }
+
+ }
+
+
+

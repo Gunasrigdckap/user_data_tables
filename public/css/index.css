@@ -5,3 +5,33 @@
     margin-bottom: 20px;
     gap: 10px;
 }
+
+
+.side-overlay {
+    position: fixed;
+    top: 0;
+    right: -350px;
+    width: 300px;
+    height: 100%;
+    background: #f4f4f4;
+    padding: 20px;
+    box-shadow: -4px 0 10px rgba(0, 0, 0, 0.2);
+    transition: right 0.3s ease;
+    z-index: 1;
+}
+.side-overlay.open {
+    right: 0;
+}
+.side-overlay .close-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 20px;
+    cursor: pointer;
+}
+.side-overlay h2 {
+    margin-top: 50px;
+}
+#name{
+  cursor: pointer;
+}
